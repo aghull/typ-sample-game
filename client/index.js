@@ -2,7 +2,7 @@ import React from 'react'
 import { Page, render } from 'typ-client';
 import style from './style.scss';
 
-export default class TicTacToePage extends Page {
+class TicTacToePage extends Page {
   constructor(props) {
     super(props);
     this.components = {

@@ -1,6 +1,7 @@
 /* global game */
 
-game.minPlayers = game.maxPlayers = 1;
+game.minPlayers = 1;
+game.maxPlayers = 10;
 
 game.initialVariables = {
   winner: null,
@@ -8,8 +9,12 @@ game.initialVariables = {
   guesses: 0
 };
 
-['#TL', '#TC', '#TR', '#ML', '#MC', '#MR', '#BL', '#BC', '#BR'].forEach(s => game.board.addSpace(s, 'square'));
-['#X', '#O'].forEach(p => game.board.addPieces(9, p, 'mark'));
+game.setup = () => {
+  ['#TL', '#TC', '#TR', '#ML', '#MC', '#MR', '#BL', '#BC', '#BR'].forEach(s => game.board.addSpace(s, 'square'));
+  ['#X', '#O'].forEach(p => game.board.addPiece(p, 'mark', {x:100, y:100}));
+  game.board.find('#TC').addPiece('#X', 'mark', {x:0, y:0});
+  game.board.find('#TL').addPiece('#O', 'mark', {x:0, y:0});
+}
 
 game.hide('correct');
 
