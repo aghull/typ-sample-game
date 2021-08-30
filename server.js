@@ -16,16 +16,9 @@ game.setup = () => {
   game.board.find('#TL').addPiece('#O', 'mark', {x:0, y:0});
 }
 
-game.hide('correct');
-
-game.moves = {
-  guess: number => {
-    if (number === String(game.get('correct'))) {
-      game.phase = 'finished'
-      game.set('winner', game.player)
-    } else {
-      game.set('guesses', game.get('guesses') + 1)
-      game.endTurn()
-    }
+game.play = async () => {
+  game.playersMayAlwaysMove('mark');
+  while(true) {
+    await game.anyPlayerPlay([]);
   }
 }
