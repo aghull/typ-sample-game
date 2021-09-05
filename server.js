@@ -3,22 +3,36 @@
 game.minPlayers = 1;
 game.maxPlayers = 10;
 
-game.initialVariables = {
-  winner: null,
-  correct: Math.floor(Math.random() * 10) + 1,
-  guesses: 0
-};
-
 game.setup = () => {
-  ['#TL', '#TC', '#TR', '#ML', '#MC', '#MR', '#BL', '#BC', '#BR'].forEach(s => game.board.addSpace(s, 'square'));
-  ['#X', '#O'].forEach(p => game.board.addPiece(p, 'mark', {x:100, y:100}));
-  game.board.find('#TC').addPiece('#X', 'mark', {x:0, y:0});
-  game.board.find('#TL').addPiece('#O', 'mark', {x:0, y:0});
+  //utils.times(4, i => game.board.addSpace(`player${i}`, 'tableau'));
+  game.board.addSpace('#playarea', 'area');
+  game.board.find('#playarea').addPiece('#Abe', 'card', {x:0, y:0});
+  game.board.find('#playarea').addPiece('#Isaac', 'card', {x:50, y:50});
 }
 
+game.hidden = () => 'card[flipped]'
+
 game.play = async () => {
-  game.playersMayAlwaysMove('mark');
+  game.playersMayAlwaysMove('card');
   while(true) {
-    await game.anyPlayerPlay([]);
+    await game.anyPlayerPlay([flip, activate, deactivate]);
   }
+}
+
+function flip(card) {
+  return game.choose(card, game.board.findAll('card'), () => {
+    card.set('flipped', !card.get('flipped'))
+  })
+}
+
+function activate(card) {
+  return game.choose(card, game.board.findAll('card:not([active]):not([flipped])'), () => {
+    card.set('active', true)
+  })
+}
+
+function deactivate(card) {
+  return game.choose(card, game.board.findAll('card[active]:not([flipped])'), () => {
+    card.set('active', false)
+  })
 }
