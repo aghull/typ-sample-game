@@ -3,36 +3,54 @@
 game.minPlayers = 1;
 game.maxPlayers = 10;
 
-game.setup = () => {
-  //utils.times(4, i => game.board.addSpace(`player${i}`, 'tableau'));
-  game.board.addSpace('#playarea', 'area');
-  game.board.find('#playarea').addPiece('#Abe', 'card', {x:0, y:0});
-  game.board.find('#playarea').addPiece('#Isaac', 'card', {x:50, y:50});
-}
+game.setupPlayerMat = mat => {
+  mat.addSpace('#look-at', 'area');
+  mat.addSpace('#tableau', 'area');
+  mat.addSpace('#hand', 'area');
+};
 
-game.hidden = () => 'card[flipped]'
+game.setupBoard = board => {
+  game.playerMat(1).find('#hand').addPiece('#Abe', 'card');
+  game.playerMat(2).find('#hand').addPiece('#Isaac', 'card');
+  const shop = board.addSpace('#shop', 'area');
+  shop.addPiece('#1-Up', 'card');
+};
+
+game.hidden = () => `card[flipped], #player-mat:not(.mine) #hand card`;
 
 game.play = async () => {
   game.playersMayAlwaysMove('card');
+  const allActions = Object.keys(game.actions);
   while(true) {
-    await game.anyPlayerPlay([flip, activate, deactivate]);
+    await game.anyPlayerPlay(allActions);
   }
-}
+};
 
-function flip(card) {
-  return game.choose(card, game.board.findAll('card'), () => {
-    card.set('flipped', !card.get('flipped'))
-  })
-}
-
-function activate(card) {
-  return game.choose(card, game.board.findAll('card:not([active]):not([flipped])'), () => {
-    card.set('active', true)
-  })
-}
-
-function deactivate(card) {
-  return game.choose(card, game.board.findAll('card[active]:not([flipped])'), () => {
-    card.set('active', false)
-  })
-}
+game.actions = {
+  flip: {
+    select: "card",
+    prompt: "Flip this card",
+    action: card => card.set('flipped', !card.get('flipped'))
+  },
+  activate: {
+    select: "card:not([active]):not([flipped])",
+    prompt: "Activate this card",
+    action: card => card.set('active', true)
+  },
+  deactivate: {
+    prompt: "Deactivate this card",
+    select: "card[active]:not([flipped])",
+    action: card => card.set('active', false)
+  },
+  play: {
+    prompt: "Play this card onto your board",
+    drag: ".mine #hand card",
+    onto: ".mine #tableau"
+  },
+  remove: {
+    prompt: "Put this card back in your hand",
+    promptOnto: "Which hand",
+    drag: "#tableau card",
+    onto: "#hand",
+  },
+};
